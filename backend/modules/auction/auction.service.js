@@ -6,7 +6,6 @@ const Notification = require("../notification/notification.model");
 const Customer = require("../customer/customer.model");
 const Product = require("../product/product.model");
 const Winner = require("../winner/winner.model");
-const WonProduct = require("../wallet/wonProduct.model");
 const { getIo } = require("../../socket/socketStore");
 const {
   getOrCreateWallet,
@@ -291,54 +290,6 @@ const persistWinner = async (payload) => {
     upsert: true,
     new: true,
     setDefaultsOnInsert: true
-  });
-};
-
-const persistWonProduct = async (auction, currentProduct) => {
-  if (!auction || !currentProduct?.highest_bidder_id || !currentProduct?.product_id) {
-    return null;
-  }
-
-  const winningBid = normalizeMoney(currentProduct.current_price || currentProduct.min_bid || 0);
-
-  return WonProduct.findOneAndUpdate(
-    {
-      auction_id: auction._id,
-      product_id: currentProduct.product_id
-    },
-    {
-      $setOnInsert: {
-        user_id: currentProduct.highest_bidder_id,
-        product_id: currentProduct.product_id,
-        auction_id: auction._id,
-        winning_bid: winningBid,
-        status: "won",
-        created_at: new Date()
-      }
-    },
-    {
-      upsert: true,
-      new: true,
-      setDefaultsOnInsert: true
-    }
-  );
-};
-
-const notifyAuctionWinner = async (auction, currentProduct) => {
-  if (!auction || !currentProduct?.highest_bidder_id) {
-    return null;
-  }
-
-  return Notification.create({
-    user_id: currentProduct.highest_bidder_id,
-    type: "AUCTION_WIN",
-    title: "You won this auction!",
-    message: `You won ${currentProduct.product_name || "an auction product"} for Rs. ${normalizeMoney(currentProduct.current_price || currentProduct.min_bid || 0).toLocaleString()}.`,
-    link: "/wallet",
-    metadata: {
-      auction_id: auction._id,
-      product_id: currentProduct.product_id
-    }
   });
 };
 
@@ -929,9 +880,7 @@ exports.finalizeCurrentProductService = async (room_id, options = {}) => {
   const winnerRecord = await persistWinner(await buildWinnerPayload(auction, currentProduct, sold ? "SOLD" : "UNSOLD"));
 
   if (sold) {
-    await persistWonProduct(auction, currentProduct);
     await settleWinnerWallet(winnerRecord);
-    await notifyAuctionWinner(auction, currentProduct);
   }
 
   await Product.findByIdAndUpdate(currentProduct.product_id, {

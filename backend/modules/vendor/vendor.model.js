@@ -1,65 +1,46 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const vendorSchema = new mongoose.Schema({
-
+const Vendor = sequelize.define("Vendor", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   shop_name: {
-    type: String,
-    required: true,
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   owner_name: {
-    type: String,
-    required: true,
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   email: {
-    type: String,
-    required: true,
-    unique: true,   // ✔ already creates index
-    lowercase: true,
-    trim: true,
-    match: [/^\S+@\S+\.\S+$/, "Invalid email"]
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   phone: {
-    type: String,
-    match: [/^[0-9]{10}$/, "Invalid phone number"]
+    type: DataTypes.STRING,
+    allowNull: true
   },
-
   address: {
-    type: String,
-    trim: true
+    type: DataTypes.TEXT,
+    allowNull: true
   },
-
   password: {
-    type: String,
-    required: true,
-    minlength: 4,
-    select: false
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   status: {
-    type: String,
-    enum: ["PENDING", "APPROVED", "BLOCKED"],
-    default: "PENDING"
+    type: DataTypes.STRING,
+    defaultValue: "PENDING"
   },
-
   lastLogin: {
-    type: Date
+    type: DataTypes.DATE,
+    allowNull: true
   }
-
 }, {
+  tableName: "vendors",
   timestamps: true
 });
 
-
-/* SAFE OBJECT */
-vendorSchema.methods.toSafeObject = function () {
-  const obj = this.toObject();
-  delete obj.password;
-  return obj;
-};
-
-module.exports = mongoose.model("Vendor", vendorSchema);
+module.exports = enhanceModel(Vendor);

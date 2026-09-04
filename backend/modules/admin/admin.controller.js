@@ -3,6 +3,7 @@ const Customer = require("../customer/customer.model");
 const Vendor = require("../vendor/vendor.model");
 
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 const {
   successResponse,
@@ -93,7 +94,14 @@ exports.login = async (req, res) => {
       return errorResponse(res, "Invalid credentials", 401);
     }
 
-    if (admin.password !== password) {
+    let match = admin.password === password;
+    if (!match && admin.password) {
+      try {
+        match = await bcrypt.compare(password, admin.password);
+      } catch {}
+    }
+
+    if (!match) {
       return errorResponse(res, "Invalid credentials", 401);
     }
 

@@ -1,42 +1,42 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const CartItemSchema = new mongoose.Schema({
-
-  product_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true
+const Cart = sequelize.define("Cart", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-
-  quantity: {
-    type: Number,
-    default: 1
-  },
-
-  price: Number
-
-});
-
-const CartSchema = new mongoose.Schema({
-
   user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Customer",
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
-
-  items: [CartItemSchema],
-
+  items: {
+    type: DataTypes.JSON,
+    defaultValue: [],
+    get() {
+      const raw = this.getDataValue("items");
+      if (!raw) return [];
+      try {
+        return typeof raw === "string" ? JSON.parse(raw) : raw;
+      } catch {
+        return [];
+      }
+    },
+    set(val) {
+      this.setDataValue("items", typeof val === "object" ? val : JSON.parse(val || "[]"));
+    }
+  },
   status: {
-    type: String,
-    default: "ACTIVE"
+    type: DataTypes.STRING,
+    defaultValue: "ACTIVE"
   },
-
   created_at: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
-
+}, {
+  tableName: "carts",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Cart", CartSchema);
+module.exports = enhanceModel(Cart);

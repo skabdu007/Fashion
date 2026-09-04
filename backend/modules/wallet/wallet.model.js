@@ -1,71 +1,63 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const WalletSchema = new mongoose.Schema({
+const Wallet = sequelize.define("Wallet", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Customer",
-    required: true,
+    type: DataTypes.DOUBLE,
+    allowNull: false,
     unique: true
   },
   red_chips: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   blue_chips: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   green_chips: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   yellow_chips: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   black_chips: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   cash_balance: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
-  transactions: [{
-    type: {
-      type: String,
-      enum: ["CREDIT", "DEBIT"],
-      required: true
+  transactions: {
+    type: DataTypes.JSON,
+    defaultValue: [],
+    get() {
+      const raw = this.getDataValue("transactions");
+      if (!raw) return [];
+      try {
+        return typeof raw === "string" ? JSON.parse(raw) : raw;
+      } catch {
+        return [];
+      }
     },
-    amount: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    description: {
-      type: String,
-      required: true
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now
+    set(val) {
+      this.setDataValue("transactions", typeof val === "object" ? val : JSON.parse(val || "[]"));
     }
-  }],
+  },
   created_at: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
 }, {
-  collection: "wallets"
+  tableName: "wallets",
+  timestamps: true
 });
 
-WalletSchema.pre("save", function normalizeFields() {
-  this.red_chips = Number(this.red_chips || 0);
-  this.blue_chips = Number(this.blue_chips || 0);
-  this.green_chips = Number(this.green_chips || 0);
-  this.yellow_chips = Number(this.yellow_chips || 0);
-  this.black_chips = Number(this.black_chips || 0);
-  this.cash_balance = Number(this.cash_balance || 0);
-});
-
-module.exports = mongoose.model("Wallet", WalletSchema);
+module.exports = enhanceModel(Wallet);

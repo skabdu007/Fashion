@@ -18,19 +18,8 @@ const server = http.createServer(app);
 
 connectDB();
 
-const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(",").map((url) => url.trim().replace(/\/$/, ""))
-  : [];
-
-const corsOriginHandler = (origin, callback) => {
-  if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin) || allowedOrigins.includes("*") || process.env.NODE_ENV !== "production") {
-    return callback(null, true);
-  }
-  return callback(null, true); // Permissive fallback to prevent breaking cloud deployments
-};
-
 app.use(cors({
-  origin: corsOriginHandler,
+  origin: process.env.CLIENT_URL || true,
   credentials: true
 }));
 app.use(express.json());
@@ -66,12 +55,20 @@ app.get("/", (req, res) => {
   });
 });
 
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
 app.use(require("./middleware/errorHandler"));
 
 const PORT = process.env.PORT || 5001;
 const io = new Server(server, {
   cors: {
-    origin: corsOriginHandler,
+    origin: process.env.CLIENT_URL || true,
     credentials: true
   }
 });

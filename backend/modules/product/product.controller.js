@@ -13,15 +13,10 @@ exports.create = async (req, res) => {
       product_name,
       description,
       price,
-      stock,
-      status,
-      is_auction_exclusive,
-      auction_availability
+      stock
     } = req.body;
 
     const image = req.file ? `/uploads/${req.file.filename}` : null;
-    const normalizedAuctionExclusive =
-      String(is_auction_exclusive || "false").toLowerCase() === "true";
 
     const product = await Product.create({
       vendor_id,
@@ -30,12 +25,7 @@ exports.create = async (req, res) => {
       description,
       price,
       stock,
-      image,
-      status: status || "ACTIVE",
-      is_auction_exclusive: normalizedAuctionExclusive,
-      auction_availability: normalizedAuctionExclusive
-        ? auction_availability || "AVAILABLE"
-        : "AVAILABLE"
+      image
     });
 
     const populated = await Product.findById(product._id).populate(productPopulate);

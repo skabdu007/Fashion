@@ -1,34 +1,58 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const NotificationSchema = new mongoose.Schema({
+const Notification = sequelize.define("Notification", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Customer",
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
   type: {
-    type: String,
-    enum: ["INVITE", "ORDER", "PAYMENT", "SYSTEM", "AUCTION_WIN"],
-    default: "SYSTEM"
+    type: DataTypes.STRING,
+    allowNull: true
   },
   title: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   message: {
-    type: String,
-    required: true
+    type: DataTypes.TEXT,
+    allowNull: false
   },
-  link: String,
-  room_code: String,
+  link: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  room_code: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   metadata: {
-    type: mongoose.Schema.Types.Mixed,
-    default: {}
+    type: DataTypes.STRING,
+    allowNull: true,
+    get() {
+      const raw = this.getDataValue("metadata");
+      if (!raw) return null;
+      try {
+        return typeof raw === "string" ? JSON.parse(raw) : raw;
+      } catch {
+        return raw;
+      }
+    },
+    set(val) {
+      this.setDataValue("metadata", typeof val === "object" ? JSON.stringify(val) : val);
+    }
   },
   is_read: {
-    type: Boolean,
-    default: false
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
-}, { timestamps: true });
+}, {
+  tableName: "notifications",
+  timestamps: true
+});
 
-module.exports = mongoose.model("Notification", NotificationSchema);
+module.exports = enhanceModel(Notification);

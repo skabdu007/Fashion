@@ -1,47 +1,59 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const WalletTransactionSchema = new mongoose.Schema({
+const WalletTransaction = sequelize.define("WalletTransaction", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   wallet_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Wallet",
-    required: true,
-    index: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
   user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Customer",
-    required: true,
-    index: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
   type: {
-    type: String,
-    enum: ["CREDIT", "DEBIT"],
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
   category: {
-    type: String,
-    enum: ["CASH", "CHIP", "ORDER", "REFUND", "SYSTEM"],
-    default: "SYSTEM"
+    type: DataTypes.STRING,
+    allowNull: true
   },
   chip_type: {
-    type: String,
-    enum: ["BLUE", "GREEN", "YELLOW", "RED", "BLACK", null],
-    default: null
+    type: DataTypes.STRING,
+    allowNull: true
   },
   amount: {
-    type: Number,
-    required: true,
-    min: 0
+    type: DataTypes.DOUBLE,
+    allowNull: false,
+    defaultValue: 0
   },
   description: {
-    type: String,
-    required: true,
-    trim: true
+    type: DataTypes.TEXT,
+    allowNull: false
   },
   metadata: {
-    type: mongoose.Schema.Types.Mixed,
-    default: {}
+    type: DataTypes.STRING,
+    allowNull: true,
+    get() {
+      const raw = this.getDataValue("metadata");
+      if (!raw) return null;
+      try {
+        return typeof raw === "string" ? JSON.parse(raw) : raw;
+      } catch {
+        return raw;
+      }
+    },
+    set(val) {
+      this.setDataValue("metadata", typeof val === "object" ? JSON.stringify(val) : val);
+    }
   }
-}, { timestamps: true, collection: "wallet_transactions" });
+}, {
+  tableName: "wallettransactions",
+  timestamps: true
+});
 
-module.exports = mongoose.model("WalletTransaction", WalletTransactionSchema);
+module.exports = enhanceModel(WalletTransaction);

@@ -135,7 +135,7 @@ exports.removeItem = async (req, res, next) => {
       return res.status(404).json({ message: "Item not found" });
     }
 
-    cart.items.pull(req.params.id);
+    item.remove();
 
     await cart.save();
 

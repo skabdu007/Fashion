@@ -1,31 +1,34 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const CategorySchema = new mongoose.Schema({
-
+const Category = sequelize.define("Category", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   parent_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-    default: null
+    type: DataTypes.DOUBLE,
+    allowNull: true
   },
-
   name: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
-  description: String,
-
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
   status: {
-    type: String,
-    enum: ["ACTIVE", "INACTIVE"],
-    default: "ACTIVE"
+    type: DataTypes.STRING,
+    defaultValue: "ACTIVE"
   },
-
   created_at: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
-
+}, {
+  tableName: "categorys",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Category", CategorySchema);
+module.exports = enhanceModel(Category);

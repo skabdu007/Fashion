@@ -1,70 +1,79 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const ProductSchema = new mongoose.Schema({
+const Product = sequelize.define("Product", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   vendor_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Vendor",
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
   category_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-    default: null
+    type: DataTypes.DOUBLE,
+    allowNull: true
   },
   product_name: {
-    type: String,
-    required: true,
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-  description: String,
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
   price: {
-    type: Number,
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false,
+    defaultValue: 0
   },
   stock: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
-  image: String,
+  image: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
   sold_count: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   rating: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   review_count: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   views: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
   status: {
-    type: String,
-    enum: ["ACTIVE", "INACTIVE"],
-    default: "ACTIVE"
+    type: DataTypes.STRING,
+    defaultValue: "ACTIVE"
   },
   is_auction_exclusive: {
-    type: Boolean,
-    default: false
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   },
   auction_room_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Auction",
-    default: null
+    type: DataTypes.DOUBLE,
+    allowNull: true
   },
   auction_availability: {
-    type: String,
-    enum: ["AVAILABLE", "RESERVED", "SOLD"],
-    default: "AVAILABLE"
+    type: DataTypes.STRING,
+    allowNull: true
   },
   created_at: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
+}, {
+  tableName: "products",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Product", ProductSchema);
+module.exports = enhanceModel(Product);

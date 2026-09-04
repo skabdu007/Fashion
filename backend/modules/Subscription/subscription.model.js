@@ -1,34 +1,34 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const SubscriptionSchema = new mongoose.Schema({
-
+const Subscription = sequelize.define("Subscription", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Customer",
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
-
   plan: {
-    type: String,
-    enum: ["SILVER", "GOLD", "PLATINUM"],
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   start_date: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    allowNull: true
   },
-
   end_date: {
-    type: Date
+    type: DataTypes.DATE,
+    allowNull: true
   },
-
   status: {
-    type: String,
-    enum: ["ACTIVE", "EXPIRED"],
-    default: "ACTIVE"
+    type: DataTypes.STRING,
+    defaultValue: "ACTIVE"
   }
-
+}, {
+  tableName: "subscriptions",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Subscription", SubscriptionSchema);
+module.exports = enhanceModel(Subscription);

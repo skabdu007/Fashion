@@ -1,5 +1,4 @@
 const WalletTransaction = require("./walletTransaction.model");
-const WonProduct = require("./wonProduct.model");
 const {
   CHIP_FIELDS,
   normalizeWallet,
@@ -227,48 +226,10 @@ exports.viewWallet = async (req, res) => {
     validateUserId(user_id);
 
     const wallet = await getOrCreateWallet(user_id);
-    const wonProducts = await WonProduct.find({ user_id })
-      .populate("product_id", "product_name description image price category_id")
-      .populate("auction_id", "room_code status end_time createdAt")
-      .sort({ created_at: -1 })
-      .lean();
-
-    const walletData = normalizeWallet(wallet);
 
     res.json({
       success: true,
-      data: {
-        ...walletData,
-        won_products: wonProducts.map((entry) => ({
-          _id: entry._id,
-          user_id: entry.user_id,
-          product_id: entry.product_id?._id || entry.product_id,
-          auction_id: entry.auction_id?._id || entry.auction_id,
-          winning_bid: Number(entry.winning_bid || 0),
-          status: entry.status || "won",
-          created_at: entry.created_at,
-          product: entry.product_id
-            ? {
-                _id: entry.product_id._id,
-                product_name: entry.product_id.product_name,
-                description: entry.product_id.description || "",
-                image: entry.product_id.image || "",
-                price: Number(entry.product_id.price || 0),
-                category_id: entry.product_id.category_id || null
-              }
-            : null,
-          auction: entry.auction_id
-            ? {
-                _id: entry.auction_id._id,
-                room_code: entry.auction_id.room_code || "",
-                status: entry.auction_id.status || "",
-                end_time: entry.auction_id.end_time || null,
-                created_at: entry.auction_id.createdAt || null
-              }
-            : null
-        })),
-        won_products_count: wonProducts.length
-      }
+      data: normalizeWallet(wallet)
     });
   } catch (error) {
     console.error("[wallet] viewWallet error", error);

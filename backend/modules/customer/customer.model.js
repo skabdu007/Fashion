@@ -1,96 +1,82 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const BankAccountSchema = new mongoose.Schema({
-  account_holder_name: {
-    type: String,
-    trim: true,
-    default: ""
+const Customer = sequelize.define("Customer", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-  account_number: {
-    type: String,
-    trim: true,
-    default: ""
-  },
-  ifsc_code: {
-    type: String,
-    trim: true,
-    uppercase: true,
-    default: ""
-  },
-  bank_name: {
-    type: String,
-    trim: true,
-    default: ""
-  }
-}, { _id: false });
-
-const customerSchema = new mongoose.Schema({
-
   username: {
-    type: String,
-    required: true,
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   nickname: {
-    type: String
+    type: DataTypes.STRING,
+    allowNull: true
   },
-
   email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   address: {
-    type: String
+    type: DataTypes.TEXT,
+    allowNull: true
   },
-
   phone: {
-    type: String
+    type: DataTypes.STRING,
+    allowNull: true
   },
-
   dob: {
-    type: Date
+    type: DataTypes.DATE,
+    allowNull: true
   },
-
-  // 🔒 HASHED PASSWORD
   password: {
-    type: String,
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
+  raw_password: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   status: {
-    type: String,
-    enum: ["ACTIVE", "BLOCKED"],
-    default: "ACTIVE"
+    type: DataTypes.STRING,
+    defaultValue: "ACTIVE"
   },
-
   last_login: {
-    type: Date
+    type: DataTypes.DATE,
+    allowNull: true
   },
-
   orders_count: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
-
   total_spent: {
-    type: Number,
-    default: 0
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
   },
-
   bank_account: {
-    type: BankAccountSchema,
-    default: () => ({})
+    type: DataTypes.STRING,
+    allowNull: true,
+    get() {
+      const raw = this.getDataValue("bank_account");
+      if (!raw) return {};
+      try {
+        return typeof raw === "string" ? JSON.parse(raw) : raw;
+      } catch {
+        return {};
+      }
+    },
+    set(val) {
+      this.setDataValue("bank_account", typeof val === "object" ? JSON.stringify(val) : val);
+    }
   },
-
   created_at: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
-
+}, {
+  tableName: "customers",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Customer", customerSchema);
+module.exports = enhanceModel(Customer);

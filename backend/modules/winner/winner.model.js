@@ -1,61 +1,58 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const WinnerSchema = new mongoose.Schema({
-
-  auction_id:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Auction"
+const Winner = sequelize.define("Winner", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-
-  product_id:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Product",
-    default:null
+  auction_id: {
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
-
-  product_name:{
-    type:String,
-    default:""
+  product_id: {
+    type: DataTypes.DOUBLE,
+    allowNull: true
   },
-
-  user_id:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Customer"
+  product_name: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
-
-  winner_name:{
-    type:String,
-    default:""
+  user_id: {
+    type: DataTypes.DOUBLE,
+    allowNull: true
   },
-
-  winner_nickname:{
-    type:String,
-    default:""
+  winner_name: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
-
-  winning_bid:Number,
-
-  result_type:{
-    type:String,
-    enum:["SOLD","UNSOLD"],
-    default:"SOLD"
+  winner_nickname: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
-
+  winning_bid: {
+    type: DataTypes.DOUBLE,
+    defaultValue: 0
+  },
+  result_type: {
+    type: DataTypes.STRING,
+    defaultValue: "SOLD"
+  },
   wallet_settled: {
-    type: Boolean,
-    default: false
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   },
-
   wallet_settled_at: {
-    type: Date,
-    default: null
+    type: DataTypes.DATE,
+    allowNull: true
   },
-
-  declared_at:{
-    type:Date,
-    default:Date.now
+  declared_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
-
+}, {
+  tableName: "winners",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Winner",WinnerSchema);
+module.exports = enhanceModel(Winner);

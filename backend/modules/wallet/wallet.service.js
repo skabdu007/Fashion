@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const Wallet = require("./wallet.model");
 const WalletTransaction = require("./walletTransaction.model");
 
@@ -45,7 +44,7 @@ const normalizeWallet = (wallet) => {
 };
 
 const validateUserId = (user_id) => {
-  if (!user_id || !mongoose.Types.ObjectId.isValid(String(user_id))) {
+  if (!user_id || String(user_id).trim() === "") {
     const error = new Error("Valid user_id is required");
     error.statusCode = 400;
     throw error;

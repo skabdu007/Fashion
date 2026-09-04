@@ -69,13 +69,6 @@ router.post(
   controller.finalizeCurrentProduct
 );
 
-router.post(
-  "/complete/:auctionId",
-  verifyToken,
-  requireSuperAdmin,
-  controller.completeAuction
-);
-
 /* BOARD */
 router.get(
   "/board/:room_id",

@@ -1,37 +1,39 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const PaymentSchema = new mongoose.Schema({
-
+const Payment = sequelize.define("Payment", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   order_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Order",
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
-
   payment_type: {
-    type: String,
-    enum: ["DIRECT", "WALLET", "UPI", "CARD"],
-    required: true
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   amount: {
-    type: Number,
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false,
+    defaultValue: 0
   },
-
   payment_status: {
-    type: String,
-    enum: ["PENDING", "SUCCESS", "FAILED"],
-    default: "PENDING"
+    type: DataTypes.STRING,
+    defaultValue: "PENDING"
   },
-
-  transaction_reference: String,
-
+  transaction_reference: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   created_at: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
-
+}, {
+  tableName: "payments",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Payment", PaymentSchema);
+module.exports = enhanceModel(Payment);

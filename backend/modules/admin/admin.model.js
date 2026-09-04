@@ -1,76 +1,46 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const AdminSchema = new mongoose.Schema({
-
+const Admin = sequelize.define("Admin", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    minlength: 3
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    match: [/^\S+@\S+\.\S+$/, "Please use a valid email"]
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   password: {
-    type: String,
-    required: true,
-    minlength: 4, // simple project ku ok
-    select: false   // 🔥 hide password by default
+    type: DataTypes.STRING,
+    allowNull: false
   },
-
   full_name: {
-    type: String,
-    trim: true
+    type: DataTypes.STRING,
+    allowNull: true
   },
-
   phone: {
-    type: String,
-    match: [/^[0-9]{10}$/, "Invalid phone number"]
+    type: DataTypes.STRING,
+    allowNull: true
   },
-
   role: {
-    type: String,
-    enum: ["SUPER_ADMIN", "ADMIN"],
-    default: "ADMIN"
+    type: DataTypes.STRING,
+    defaultValue: "ADMIN"
   },
-
   status: {
-    type: String,
-    enum: ["ACTIVE", "BLOCKED"],
-    default: "ACTIVE"
+    type: DataTypes.STRING,
+    defaultValue: "ACTIVE"
   },
-
   lastLogin: {
-    type: Date
+    type: DataTypes.DATE,
+    allowNull: true
   }
-
 }, {
-  timestamps: true // 🔥 auto createdAt, updatedAt
+  tableName: "admins",
+  timestamps: true
 });
 
-
-/* ================= INDEX ================= */
-
-// Faster email search
-AdminSchema.index({ email: 1 });
-
-
-/* ================= METHODS ================= */
-
-// remove sensitive fields
-AdminSchema.methods.toSafeObject = function () {
-  const obj = this.toObject();
-  delete obj.password;
-  return obj;
-};
-
-
-module.exports = mongoose.model("Admin", AdminSchema);
+module.exports = enhanceModel(Admin);

@@ -18,15 +18,13 @@ exports.getAdminDashboard = async (req, res) => {
 
     const totalOrders = await Order.countDocuments();
 
-    // revenue calculation
-    const revenue = await Order.aggregate([
-      {
-        $group: {
-          _id: null,
-          total: { $sum: "$total_amount" }
-        }
-      }
-    ]);
+    // revenue calculation via SQL
+    let totalRevenue = 0;
+    try {
+      totalRevenue = (await Order.sum("total_amount")) || 0;
+    } catch {
+      totalRevenue = 0;
+    }
 
     res.json({
       success: true,
@@ -36,7 +34,7 @@ exports.getAdminDashboard = async (req, res) => {
         totalProducts,
         totalAuctions,
         totalOrders,
-        totalRevenue: revenue[0]?.total || 0
+        totalRevenue
       }
     });
 

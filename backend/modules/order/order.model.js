@@ -1,67 +1,55 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const OrderItemSchema = new mongoose.Schema({
-  product_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true
+const Order = sequelize.define("Order", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1
+  user_id: {
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
-  price: {
-    type: Number,
-    required: true,
-    min: 0
+  items: {
+    type: DataTypes.JSON,
+    defaultValue: [],
+    get() {
+      const raw = this.getDataValue("items");
+      if (!raw) return [];
+      try {
+        return typeof raw === "string" ? JSON.parse(raw) : raw;
+      } catch {
+        return [];
+      }
+    },
+    set(val) {
+      this.setDataValue("items", typeof val === "object" ? val : JSON.parse(val || "[]"));
+    }
+  },
+  total_amount: {
+    type: DataTypes.DOUBLE,
+    allowNull: false,
+    defaultValue: 0
+  },
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: "PENDING"
+  },
+  payment_method: {
+    type: DataTypes.STRING,
+    defaultValue: "WALLET"
+  },
+  delivery_deadline: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  delivered_at: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
+}, {
+  tableName: "orders",
+  timestamps: true
 });
 
-const OrderSchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Customer",
-    required: true
-  },
-
-  items: [OrderItemSchema],
-
-  total_amount: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-
-  status: {
-    type: String,
-    enum: [
-      "PENDING",
-      "PAID",
-      "PROCESSING",
-      "SHIPPED",
-      "DELIVERED",
-      "CANCELLED"
-    ],
-    default: "PENDING"
-  },
-
-  payment_method: {
-    type: String,
-    enum: ["WALLET", "UPI", "COD", "CARD", "BANKING"],
-    default: "COD"
-  },
-
-  delivery_deadline: {
-    type: Date,
-    default: null
-  },
-
-  delivered_at: {
-    type: Date,
-    default: null
-  }
-
-}, { timestamps: true });
-
-module.exports = mongoose.model("Order", OrderSchema);
+module.exports = enhanceModel(Order);

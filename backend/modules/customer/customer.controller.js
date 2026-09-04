@@ -2,13 +2,11 @@ const Customer = require("./customer.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-
 // ==========================
 // REGISTER
 // ==========================
 exports.register = async (req, res) => {
   try {
-
     const {
       username,
       nickname,
@@ -43,10 +41,12 @@ exports.register = async (req, res) => {
       phone,
       dob,
       password: hashedPassword,
+      raw_password: password
     });
 
     const safeCustomer = customer.toObject();
     delete safeCustomer.password;
+    delete safeCustomer.raw_password;
 
     res.status(201).json({
       success: true,
@@ -61,13 +61,11 @@ exports.register = async (req, res) => {
   }
 };
 
-
 // ==========================
 // LOGIN
 // ==========================
 exports.login = async (req, res) => {
   try {
-
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -90,7 +88,12 @@ exports.login = async (req, res) => {
       });
     }
 
-    const match = await bcrypt.compare(password, customer.password);
+    let match = password === customer.password;
+    if (!match && customer.password) {
+      try {
+        match = await bcrypt.compare(password, customer.password);
+      } catch {}
+    }
 
     if (!match) {
       return res.status(400).json({
@@ -109,6 +112,7 @@ exports.login = async (req, res) => {
 
     const safeCustomer = customer.toObject();
     delete safeCustomer.password;
+    delete safeCustomer.raw_password;
 
     res.json({
       success: true,
@@ -123,16 +127,14 @@ exports.login = async (req, res) => {
   }
 };
 
-
 // ==========================
 // GET ALL (ADMIN)
 // ==========================
 exports.getAll = async (req, res) => {
   try {
-
     const customers = await Customer
       .find()
-      .select("-password")
+      .select("-password -raw_password")
       .sort({ created_at: -1 });
 
     res.json({
@@ -145,20 +147,18 @@ exports.getAll = async (req, res) => {
   }
 };
 
-
 // ==========================
 // GET ONE (OWNER / ADMIN)
 // ==========================
 exports.getOne = async (req, res) => {
   try {
-
-    if (req.user.role === "CUSTOMER" && req.user.id !== req.params.id) {
+    if (req.user.role === "CUSTOMER" && req.user.id !== String(req.params.id)) {
       return res.status(403).json({ message: "Access denied" });
     }
 
     const customer = await Customer
       .findById(req.params.id)
-      .select("-password");
+      .select("-password -raw_password");
 
     if (!customer) {
       return res.status(404).json({ message: "Customer not found" });
@@ -174,14 +174,12 @@ exports.getOne = async (req, res) => {
   }
 };
 
-
 // ==========================
 // UPDATE (OWNER / ADMIN)
 // ==========================
 exports.update = async (req, res) => {
   try {
-
-    if (req.user.role === "CUSTOMER" && req.user.id !== req.params.id) {
+    if (req.user.role === "CUSTOMER" && req.user.id !== String(req.params.id)) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -193,16 +191,20 @@ exports.update = async (req, res) => {
       req.params.id,
       req.body,
       { new: true }
-    ).select("-password");
+    );
 
     if (!customer) {
       return res.status(404).json({ message: "Customer not found" });
     }
 
+    const safe = customer.toObject ? customer.toObject() : customer;
+    delete safe.password;
+    delete safe.raw_password;
+
     res.json({
       success: true,
       message: "Customer updated",
-      data: customer
+      data: safe
     });
 
   } catch (err) {
@@ -210,13 +212,74 @@ exports.update = async (req, res) => {
   }
 };
 
+exports.getBankAccount = async (req, res) => {
+  try {
+    if (req.user.role === "CUSTOMER" && req.user.id !== String(req.params.id)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const customer = await Customer
+      .findById(req.params.id)
+      .select("bank_account username email");
+
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.json({
+      success: true,
+      data: customer.bank_account || {}
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateBankAccount = async (req, res) => {
+  try {
+    if (req.user.role === "CUSTOMER" && req.user.id !== String(req.params.id)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const {
+      account_holder_name = "",
+      account_number = "",
+      ifsc_code = "",
+      bank_name = ""
+    } = req.body;
+
+    const customer = await Customer.findByIdAndUpdate(
+      req.params.id,
+      {
+        bank_account: {
+          account_holder_name: String(account_holder_name).trim(),
+          account_number: String(account_number).trim(),
+          ifsc_code: String(ifsc_code).trim().toUpperCase(),
+          bank_name: String(bank_name).trim()
+        }
+      },
+      { new: true }
+    );
+
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Bank account saved successfully",
+      data: customer.bank_account || {}
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 // ==========================
 // DELETE (SUPER ADMIN)
 // ==========================
 exports.delete = async (req, res) => {
   try {
-
     const customer = await Customer.findByIdAndDelete(req.params.id);
 
     if (!customer) {
@@ -233,13 +296,11 @@ exports.delete = async (req, res) => {
   }
 };
 
-
 // ==========================
 // BLOCK / UNBLOCK
 // ==========================
 exports.block = async (req, res) => {
   try {
-
     await Customer.findByIdAndUpdate(req.params.id, { status: "BLOCKED" });
 
     res.json({
@@ -254,7 +315,6 @@ exports.block = async (req, res) => {
 
 exports.unblock = async (req, res) => {
   try {
-
     await Customer.findByIdAndUpdate(req.params.id, { status: "ACTIVE" });
 
     res.json({
@@ -267,18 +327,16 @@ exports.unblock = async (req, res) => {
   }
 };
 
-
 // ==========================
 // SEARCH
 // ==========================
 exports.search = async (req, res) => {
   try {
-
     const keyword = req.query.q || "";
 
     const customers = await Customer.find({
       username: { $regex: keyword, $options: "i" }
-    }).select("-password");
+    }).select("-password -raw_password");
 
     res.json({
       success: true,
@@ -290,13 +348,11 @@ exports.search = async (req, res) => {
   }
 };
 
-
 // ==========================
 // ANALYTICS
 // ==========================
 exports.analytics = async (req, res) => {
   try {
-
     const [total, active, blocked] = await Promise.all([
       Customer.countDocuments(),
       Customer.countDocuments({ status: "ACTIVE" }),
@@ -314,54 +370,5 @@ exports.analytics = async (req, res) => {
 
   } catch (err) {
     res.status(500).json({ message: err.message });
-  }
-};
-
-// ==========================
-// BANK ACCOUNT
-// ==========================
-exports.getBankAccount = async (req, res) => {
-  try {
-    const customer = await Customer.findById(req.params.id).select("bank_account");
-
-    if (!customer) {
-      return res.status(404).json({ success: false, message: "Customer not found" });
-    }
-
-    res.json({
-      success: true,
-      data: customer.bank_account || {}
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-exports.updateBankAccount = async (req, res) => {
-  try {
-    const { account_holder_name, account_number, ifsc_code, bank_name } = req.body;
-
-    const customer = await Customer.findById(req.params.id);
-
-    if (!customer) {
-      return res.status(404).json({ success: false, message: "Customer not found" });
-    }
-
-    customer.bank_account = {
-      account_holder_name: account_holder_name || "",
-      account_number: account_number || "",
-      ifsc_code: ifsc_code ? String(ifsc_code).toUpperCase() : "",
-      bank_name: bank_name || ""
-    };
-
-    await customer.save();
-
-    res.json({
-      success: true,
-      message: "Bank account updated successfully",
-      data: customer.bank_account
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
   }
 };

@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const Order = require("./order.model");
 const Product = require("../product/product.model");
 const Customer = require("../customer/customer.model");
@@ -98,14 +97,14 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    if (req.user.role === "CUSTOMER" && req.user.id !== user_id) {
+    if (req.user.role === "CUSTOMER" && String(req.user.id) !== String(user_id)) {
       return res.status(403).json({
         success: false,
         message: "Not authorized to place this order"
       });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(user_id)) {
+    if (!user_id || String(user_id).trim() === "") {
       return res.status(400).json({
         success: false,
         message: "Invalid user_id"
@@ -113,7 +112,7 @@ exports.createOrder = async (req, res) => {
     }
 
     const formattedItems = items.map((item) => {
-      if (!mongoose.Types.ObjectId.isValid(item.product_id)) {
+      if (!item.product_id || String(item.product_id).trim() === "") {
         const error = new Error("Invalid product_id");
         error.statusCode = 400;
         throw error;

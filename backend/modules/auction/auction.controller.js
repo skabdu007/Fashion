@@ -166,19 +166,6 @@ exports.finalizeCurrentProduct = async (req, res, next) => {
   }
 };
 
-exports.completeAuction = async (req, res, next) => {
-  try {
-    const result = await auctionService.finalizeCurrentProductService(
-      req.params.auctionId,
-      { forceRoomClose: true, reason: "manual-complete" }
-    );
-
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-};
-
 
 exports.bidBoard = async (req, res, next) => {
   try {

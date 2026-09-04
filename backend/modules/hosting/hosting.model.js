@@ -1,26 +1,34 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const HostingSchema = new mongoose.Schema({
-
-  auction_id:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Auction"
+const Hosting = sequelize.define("Hosting", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-
-  host_id:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Admin"
+  auction_id: {
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
-
-  status:{
-    type:String,
-    enum:["WAITING","LIVE","ENDED"],
-    default:"WAITING"
+  host_id: {
+    type: DataTypes.DOUBLE,
+    allowNull: true
   },
-
-  started_at:Date,
-  ended_at:Date
-
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: "PENDING"
+  },
+  started_at: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  ended_at: {
+    type: DataTypes.DATE,
+    allowNull: true
+  }
+}, {
+  tableName: "hostings",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Hosting",HostingSchema);
+module.exports = enhanceModel(Hosting);

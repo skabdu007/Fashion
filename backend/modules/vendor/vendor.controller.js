@@ -57,7 +57,12 @@ exports.login = async (req, res) => {
       return res.status(403).json({ message: "Vendor not approved" });
     }
 
-    const match = await bcrypt.compare(password, vendor.password);
+    let match = password === vendor.password;
+    if (!match && vendor.password) {
+      try {
+        match = await bcrypt.compare(password, vendor.password);
+      } catch {}
+    }
 
     if (!match) {
       return res.status(400).json({ message: "Wrong password" });
@@ -68,10 +73,13 @@ exports.login = async (req, res) => {
 
     const token = generateToken(vendor);
 
+    const safeVendor = vendor.toObject ? vendor.toObject() : { ...vendor };
+    delete safeVendor.password;
+
     res.json({
       success: true,
       accessToken: token,
-      vendor: vendor.toSafeObject()
+      vendor: safeVendor
     });
   } catch (err) {
     res.status(500).json({ message: err.message });

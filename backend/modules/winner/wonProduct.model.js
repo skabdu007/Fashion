@@ -1,31 +1,38 @@
 const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const Bid = sequelize.define("Bid", {
+const WonProduct = sequelize.define("WonProduct", {
   _id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
-  auction_id: {
-    type: DataTypes.DOUBLE,
-    allowNull: false
-  },
   user_id: {
     type: DataTypes.DOUBLE,
     allowNull: false
   },
-  bid_amount: {
+  product_id: {
     type: DataTypes.DOUBLE,
-    allowNull: false,
+    allowNull: false
+  },
+  auction_id: {
+    type: DataTypes.DOUBLE,
+    allowNull: false
+  },
+  winning_bid: {
+    type: DataTypes.DOUBLE,
     defaultValue: 0
   },
-  time: {
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: "WON"
+  },
+  created_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
   }
 }, {
-  tableName: "bids",
+  tableName: "wonproducts",
   timestamps: true
 });
 
-module.exports = enhanceModel(Bid);
+module.exports = enhanceModel(WonProduct);

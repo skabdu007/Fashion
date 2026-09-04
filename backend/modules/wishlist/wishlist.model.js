@@ -1,24 +1,26 @@
-const mongoose = require("mongoose");
+const { sequelize, DataTypes, enhanceModel } = require("../../config/sequelize");
 
-const WishlistSchema = new mongoose.Schema({
-
+const Wishlist = sequelize.define("Wishlist", {
+  _id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Customer",
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
-
   product_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true
+    type: DataTypes.DOUBLE,
+    allowNull: false
   },
-
   created_at: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
-
+}, {
+  tableName: "wishlists",
+  timestamps: true
 });
 
-module.exports = mongoose.model("Wishlist", WishlistSchema);
+module.exports = enhanceModel(Wishlist);
