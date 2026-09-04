@@ -1,0 +1,32 @@
+.category-admin-page .admin-table {
+  table-layout: fixed;
+}
+
+.category-admin-page .admin-table th,
+.category-admin-page .admin-table td {
+  vertical-align: top;
+}
+
+.category-admin-page .admin-table td:last-child {
+  width: 170px;
+}
+
+.category-admin-page__toolbar {
+  align-items: center;
+}
+
+.category-admin-page__search {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.category-admin-page__actions .btn {
+  min-width: 72px;
+}
+
+@media (max-width: 768px) {
+  .category-admin-page .admin-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

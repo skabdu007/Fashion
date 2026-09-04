@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Production builds
+dist/
+dist-ssr/
+build/
+**/dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Uploads directory contents (preserve folder with .gitkeep)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

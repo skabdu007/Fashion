@@ -1,0 +1,98 @@
+.home-page .category-navbar {
+  width: min(1400px, calc(100% - 32px));
+  margin: 18px auto 0;
+  padding: 16px 18px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(212, 165, 93, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(255, 251, 244, 0.96), rgba(244, 233, 215, 0.92));
+  border: 1px solid rgba(214, 198, 179, 0.7);
+  box-shadow: 0 20px 42px rgba(82, 61, 40, 0.08);
+}
+
+.home-page .cat-btn {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(207, 183, 154, 0.8);
+  background: rgba(255, 255, 255, 0.9);
+  color: #4b3a2f;
+  font-weight: 700;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-page .cat-btn:hover,
+.home-page .cat-btn.active {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #3a271b, #9a3412 58%, #c26b32 100%);
+  color: #fff;
+  box-shadow: 0 16px 30px rgba(154, 52, 18, 0.18);
+}
+
+.home-page .home-products-section {
+  width: min(1400px, calc(100% - 32px));
+  margin: 18px auto 0;
+  padding-bottom: 52px;
+}
+
+.home-page .product-grid {
+  align-items: stretch;
+  gap: 24px;
+}
+
+.home-page .product-card {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-height: 100%;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(230, 216, 199, 0.95);
+  background:
+    radial-gradient(circle at top right, rgba(212, 165, 93, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 242, 232, 0.96));
+  box-shadow: 0 18px 40px rgba(71, 53, 37, 0.08);
+  overflow: hidden;
+  animation: homeCardRise 0.45s ease both;
+}
+
+.home-page .product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 55px rgba(71, 53, 37, 0.14);
+}
+
+.home-page .product-image {
+  height: 240px;
+  border-radius: 18px;
+}
+
+.home-page .product-card h3 {
+  margin: 4px 0 0;
+}
+
+.home-page .product-card .summary-label,
+.home-page .product-card .order-price {
+  margin-bottom: 0;
+}
+
+.home-page .product-card .cta-row {
+  margin-top: auto;
+}
+
+@keyframes homeCardRise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .home-page .category-navbar,
+  .home-page .home-products-section {
+    width: min(100%, calc(100% - 24px));
+  }
+}

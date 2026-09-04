@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: fashion-backend
+    env: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET_ADMIN
+        generateValue: true
+      - key: JWT_SECRET_CUSTOMER
+        generateValue: true
+      - key: JWT_SECRET_VENDOR
+        generateValue: true
+      - key: REFRESH_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        sync: false
