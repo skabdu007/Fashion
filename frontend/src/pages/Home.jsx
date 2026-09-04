@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { useToast } from "../components/ui/ToastProvider";
 import api, { API_BASE_URL } from "../utils/axios";
+import { getProductImageUrl, handleImageError } from "../utils/image";
 import "../styles/gopal.css";
 import "./animation/home.css";
 
@@ -123,13 +124,10 @@ export default function Home() {
               products.map((product) => (
                 <div key={product._id} className="product-card">
                   <img
-                    src={
-                      product.image
-                        ? `${API_BASE_URL.replace(/\/api$/, "")}${product.image}`
-                        : "https://via.placeholder.com/200"
-                    }
+                    src={getProductImageUrl(product.image)}
                     alt={product.product_name}
                     className="product-image"
+                    onError={handleImageError}
                   />
 
                   <h3>{product.product_name}</h3>

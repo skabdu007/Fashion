@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "../ui/ToastProvider";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import api, { API_BASE_URL } from "../../utils/axios";
+import { getProductImageUrl, handleImageError } from "../../utils/image";
 import { showResultAlert } from "../../utils/alerts";
 
 const SOCKET_BASE_URL = API_BASE_URL.replace(/\/api$/, "");
@@ -397,12 +398,9 @@ export default function LiveAuctionRoom({ auctionId, mode = "customer" }) {
           <div className="auction-product-panel glass-card">
             <div className="auction-product-media">
               <img
-                src={
-                  room.product?.image
-                    ? `${API_BASE_URL.replace(/\/api$/, "")}${room.product.image}`
-                    : "https://via.placeholder.com/640x420?text=Auction+Product"
-                }
+                src={getProductImageUrl(room.product?.image)}
                 alt={room.product?.product_name || "Auction product"}
+                onError={handleImageError}
               />
             </div>
 

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
 import { useToast } from "../../components/ui/ToastProvider";
 import api, { API_BASE_URL } from "../../utils/axios";
+import { getProductImageUrl, handleImageError } from "../../utils/image";
 import { getStoredUser, getUserId } from "../../utils/session";
 import { normalizeWallet } from "../../utils/wallet";
 import "../../styles/gopal.css";
@@ -144,9 +145,7 @@ export default function Wallet() {
                 <div className="wallet-wins-grid">
                   {wonProducts.map((wonProduct) => {
                     const product = wonProduct.product || {};
-                    const imageSrc = product.image
-                      ? `${API_BASE_URL.replace(/\/api$/, "")}${product.image}`
-                      : "https://via.placeholder.com/240x180?text=Auction+Win";
+                    const imageSrc = getProductImageUrl(product.image);
 
                     return (
                       <article key={wonProduct._id} className="glass-card wallet-win-card">
@@ -154,6 +153,7 @@ export default function Wallet() {
                           src={imageSrc}
                           alt={product.product_name || "Won product"}
                           className="wallet-win-card__image"
+                          onError={handleImageError}
                         />
 
                         <div className="wallet-win-card__body">

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../utils/axios";
+import { getProductImageUrl, handleImageError } from "../../utils/image";
 import "../../styles/gopal.css";
 
 export default function Product() {
@@ -154,13 +155,10 @@ export default function Product() {
               <td>{p.stock}</td>
               <td>
                 <img
-                  src={
-                    p.image
-                      ? `${API_BASE_URL.replace(/\/api$/, "")}${p.image}`
-                      : "https://via.placeholder.com/50"
-                  }
+                  src={getProductImageUrl(p.image)}
                   className="product-image"
                   alt={p.product_name}
+                  onError={handleImageError}
                 />
               </td>
               <td>

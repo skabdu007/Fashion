@@ -7,3 +7,9 @@ yarn-debug.log*
 yarn-error.log*
 uploads/*
 !uploads/.gitkeep
+!uploads/shadow_onyx_velvet_blazer.jpg
+!uploads/emerald_silk_evening_gown.jpg
+!uploads/royal_chrono_automatic_watch.jpg
+!uploads/diamond_solitaire_pendant_18k.jpg
+!uploads/italian_calfskin_oxford_shoes.jpg
+!uploads/signature_monogram_tote_bag.jpg

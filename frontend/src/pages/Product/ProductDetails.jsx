@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { API_BASE_URL } from "../../utils/axios";
-import api from "../../utils/axios";
+import api, { API_BASE_URL } from "../../utils/axios";
+import { getProductImageUrl, handleImageError } from "../../utils/image";
 import useCurrentUser from "../../hooks/useCurrentUser";
 import { createProductReview, getProductReviews } from "../../services/reviewService";
 import { getUserOrders } from "../../services/orderService";
@@ -90,8 +90,9 @@ export default function ProductDetails() {
         <section className="glass-card premium-panel product-detail-layout">
           <div className="product-detail-media">
             <img
-              src={product.image ? `${API_BASE_URL.replace(/\/api$/, "")}${product.image}` : "https://via.placeholder.com/600x420?text=CrownCart"}
+              src={getProductImageUrl(product.image)}
               alt={product.product_name}
+              onError={handleImageError}
             />
           </div>
 

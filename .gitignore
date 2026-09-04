@@ -24,9 +24,15 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Uploads directory contents (preserve folder with .gitkeep)
+# Uploads directory contents (preserve folder and seed catalog assets)
 backend/uploads/*
 !backend/uploads/.gitkeep
+!backend/uploads/shadow_onyx_velvet_blazer.jpg
+!backend/uploads/emerald_silk_evening_gown.jpg
+!backend/uploads/royal_chrono_automatic_watch.jpg
+!backend/uploads/diamond_solitaire_pendant_18k.jpg
+!backend/uploads/italian_calfskin_oxford_shoes.jpg
+!backend/uploads/signature_monogram_tote_bag.jpg
 
 # IDE and OS files
 .vscode/
