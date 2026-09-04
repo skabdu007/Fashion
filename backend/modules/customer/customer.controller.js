@@ -316,3 +316,52 @@ exports.analytics = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// ==========================
+// BANK ACCOUNT
+// ==========================
+exports.getBankAccount = async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.params.id).select("bank_account");
+
+    if (!customer) {
+      return res.status(404).json({ success: false, message: "Customer not found" });
+    }
+
+    res.json({
+      success: true,
+      data: customer.bank_account || {}
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+exports.updateBankAccount = async (req, res) => {
+  try {
+    const { account_holder_name, account_number, ifsc_code, bank_name } = req.body;
+
+    const customer = await Customer.findById(req.params.id);
+
+    if (!customer) {
+      return res.status(404).json({ success: false, message: "Customer not found" });
+    }
+
+    customer.bank_account = {
+      account_holder_name: account_holder_name || "",
+      account_number: account_number || "",
+      ifsc_code: ifsc_code ? String(ifsc_code).toUpperCase() : "",
+      bank_name: bank_name || ""
+    };
+
+    await customer.save();
+
+    res.json({
+      success: true,
+      message: "Bank account updated successfully",
+      data: customer.bank_account
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
