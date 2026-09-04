@@ -18,8 +18,27 @@ const server = http.createServer(app);
 
 connectDB();
 
+const clientUrls = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((u) => u.trim().replace(/\/$/, ""))
+  .filter(Boolean);
+
+const checkCorsOrigin = (origin, callback) => {
+  if (!origin) return callback(null, true);
+  if (
+    clientUrls.length === 0 ||
+    clientUrls.includes("*") ||
+    clientUrls.includes(origin) ||
+    origin.startsWith("http://localhost:") ||
+    origin.startsWith("http://127.0.0.1:")
+  ) {
+    return callback(null, true);
+  }
+  return callback(null, true);
+};
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || true,
+  origin: checkCorsOrigin,
   credentials: true
 }));
 app.use(express.json());
@@ -68,7 +87,7 @@ app.use(require("./middleware/errorHandler"));
 const PORT = process.env.PORT || 5001;
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || true,
+    origin: checkCorsOrigin,
     credentials: true
   }
 });
