@@ -2384,8 +2384,10 @@ h1,h2,h3 {
 }
 
 .glass-card.console-sidebar {
+  position: -webkit-sticky;
   position: sticky;
   top: 20px;
+  align-self: start;
   max-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
@@ -2534,7 +2536,7 @@ h1,h2,h3 {
   gap: 8px;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 860px) {
   .dashboard-console.dashboard-console--shell {
     grid-template-columns: 1fr;
   }
@@ -2542,10 +2544,13 @@ h1,h2,h3 {
   .console-sidebar {
     position: static;
     top: auto;
+    max-height: none;
   }
 
   .console-sidebar__nav {
+    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    overflow-y: visible;
   }
 }
 
