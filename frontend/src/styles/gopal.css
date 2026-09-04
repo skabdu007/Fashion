@@ -2385,21 +2385,27 @@ h1,h2,h3 {
 
 .glass-card.console-sidebar {
   position: sticky;
-  top: 114px;
-  display: grid;
-  gap: 20px;
-  padding: 24px 22px;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 18px;
   border-radius: 28px;
   background:
     radial-gradient(circle at top right, rgba(212, 165, 93, 0.16), transparent 28%),
     linear-gradient(180deg, rgba(19, 28, 55, 0.98), rgba(33, 42, 77, 0.98));
   color: #f8fafc;
   border: 1px solid rgba(214, 198, 179, 0.16);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
+  z-index: 30;
+  overflow: hidden;
 }
 
 .console-sidebar__brand {
   display: grid;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .console-sidebar__eyebrow {
@@ -2421,15 +2427,40 @@ h1,h2,h3 {
 }
 
 .console-sidebar__nav {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  flex: 1 1 auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 165, 93, 0.4) transparent;
+}
+
+.console-sidebar__nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.console-sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.console-sidebar__nav::-webkit-scrollbar-thumb {
+  background: rgba(212, 165, 93, 0.4);
+  border-radius: 4px;
+}
+
+.console-sidebar__nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 165, 93, 0.7);
 }
 
 .console-sidebar__link {
   display: grid;
-  gap: 4px;
-  padding: 14px 16px;
-  border-radius: 18px;
+  gap: 3px;
+  padding: 12px 14px;
+  border-radius: 16px;
   text-decoration: none;
   color: rgba(255, 247, 235, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2439,6 +2470,7 @@ h1,h2,h3 {
     border-color var(--transition),
     background var(--transition),
     box-shadow var(--transition);
+  flex-shrink: 0;
 }
 
 .console-sidebar__link:hover,
@@ -2452,16 +2484,20 @@ h1,h2,h3 {
 .console-sidebar__link-label {
   font-weight: 800;
   color: #fff;
+  font-size: 0.95rem;
 }
 
 .console-sidebar__link-caption {
   color: rgba(255, 243, 226, 0.76);
-  font-size: 0.82rem;
-  line-height: 1.45;
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .console-sidebar__footer {
   margin-top: auto;
+  flex-shrink: 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .console-sidebar__logout {
