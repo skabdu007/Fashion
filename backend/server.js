@@ -74,6 +74,14 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get(["/health", "/api/health"], (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 process.on("unhandledRejection", (err) => {
   console.error("Unhandled Rejection:", err);
 });

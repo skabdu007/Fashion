@@ -1,27 +1,52 @@
 require("dotenv").config();
 const { Sequelize, DataTypes, Op } = require("sequelize");
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME || "fashion",
-  process.env.DB_USER || "root",
-  process.env.DB_PASSWORD || "",
-  {
-    host: process.env.DB_HOST || "127.0.0.1",
-    port: Number(process.env.DB_PORT || 3306),
-    dialect: "mysql",
-    logging: false,
-    pool: {
-      max: 10,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    },
-    define: {
-      timestamps: true,
-      freezeTableName: true
-    }
-  }
-);
+const connectionUri = process.env.MYSQL_URL || process.env.DATABASE_URL;
+
+const sequelize = connectionUri
+  ? new Sequelize(connectionUri, {
+      dialect: "mysql",
+      logging: false,
+      dialectOptions:
+        process.env.DB_SSL === "true"
+          ? { ssl: { rejectUnauthorized: false } }
+          : {},
+      pool: {
+        max: 10,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      },
+      define: {
+        timestamps: true,
+        freezeTableName: true
+      }
+    })
+  : new Sequelize(
+      process.env.DB_NAME || "fashion",
+      process.env.DB_USER || "root",
+      process.env.DB_PASSWORD || "",
+      {
+        host: process.env.DB_HOST || "127.0.0.1",
+        port: Number(process.env.DB_PORT || 3306),
+        dialect: "mysql",
+        logging: false,
+        dialectOptions:
+          process.env.DB_SSL === "true"
+            ? { ssl: { rejectUnauthorized: false } }
+            : {},
+        pool: {
+          max: 10,
+          min: 0,
+          acquire: 30000,
+          idle: 10000
+        },
+        define: {
+          timestamps: true,
+          freezeTableName: true
+        }
+      }
+    );
 
 Sequelize.Model.prototype.toObject = function () {
   return this.get({ plain: true });
